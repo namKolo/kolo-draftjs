@@ -1,0 +1,16 @@
+[ignore]
+.*/build/.*
+.*/test/*
+.*/server/*
+
+[include]
+./node_modules/draft-js
+
+[libs]
+
+[options]
+module.name_mapper='^\(.*\)$' -> '<PROJECT_ROOT>/src/\1'
+
+esproposal.class_static_fields=enable
+esproposal.class_instance_fields=enable
+suppress_comment= \\(.\\|\n\\)*\\$FlowFixMe
