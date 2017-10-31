@@ -1,8 +1,15 @@
 // @flow
 import 'draft-js/dist/Draft.css';
-
+import isEmpty from 'lodash/isEmpty';
 import React, { Component } from 'react';
-import { Editor, EditorState, convertToRaw, convertFromRaw } from 'draft-js';
+import {
+  Editor,
+  EditorState,
+  convertToRaw,
+  convertFromRaw,
+  RichUtils,
+  getDefaultKeyBinding
+} from 'draft-js';
 import type { RawDraftContentState } from 'draft-js/lib/RawDraftContentState';
 import 'whatwg-fetch';
 
@@ -12,13 +19,13 @@ type Props = {};
 
 type State = {
   editorState: EditorState,
-  isSaving: boolean,
+  isSaving: boolean
 };
 
 class App extends Component<Props, State> {
   state: State = {
     editorState: EditorState.createEmpty(),
-    isSaving: false,
+    isSaving: false
   };
 
   componentDidMount() {
@@ -31,14 +38,18 @@ class App extends Component<Props, State> {
         return response.json();
       })
       .then(response => {
+        if (isEmpty(response)) {
+          return;
+        }
         const contentState = convertFromRaw(response);
         this.setState({
-          editorState: EditorState.createWithContent(contentState),
+          editorState: EditorState.createWithContent(contentState)
         });
       });
   }
 
-  handleEditorStateChange = (editorState: EditorState) => this.setState({ editorState });
+  handleEditorStateChange = (editorState: EditorState) =>
+    this.setState({ editorState });
 
   serializeEditorState = (editorState: EditorState): RawDraftContentState => {
     /*
@@ -59,11 +70,32 @@ class App extends Component<Props, State> {
       method: 'POST',
       body: JSON.stringify(data),
       headers: {
-        'Content-Type': 'application/json',
-      },
+        'Content-Type': 'application/json'
+      }
     }).then(() => {
       this.setState({ isSaving: false });
     });
+  };
+
+  /*
+    Use RichUtils to tunr on shortkey format like CMD+B, CMD+I
+  */
+  handleKeyCommand = (
+    command: string,
+    editorState: EditorState
+  ): DraftHandleValue => {
+    const newState = RichUtils.handleKeyCommand(editorState, command);
+    if (newState) {
+      this.handleEditorStateChange(newState);
+      /*
+        handled means we already handle this case - no more work need
+      */
+      return 'handled';
+    }
+    /*
+      built-in handlers will be triggered if we return not-handleds
+    */
+    return 'not-handled';
   };
 
   render() {
@@ -77,6 +109,8 @@ class App extends Component<Props, State> {
             editorState={this.state.editorState}
             onChange={this.handleEditorStateChange}
             placeholder="Tell something you like"
+            keyBindingFn={getDefaultKeyBinding}
+            handleKeyCommand={this.handleKeyCommand}
           />
           <div onClick={this.handleSyncToServer} className="mui-btn">
             SAVE
