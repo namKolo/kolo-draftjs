@@ -1,17 +1,13 @@
 // @flow
 import 'draft-js/dist/Draft.css';
+import 'whatwg-fetch';
 import isEmpty from 'lodash/isEmpty';
 import React, { Component } from 'react';
-import {
-  Editor,
-  EditorState,
-  convertToRaw,
-  convertFromRaw,
-  RichUtils,
-  getDefaultKeyBinding
-} from 'draft-js';
+import { EditorState, convertToRaw, convertFromRaw, CompositeDecorator } from 'draft-js';
 import type { RawDraftContentState } from 'draft-js/lib/RawDraftContentState';
-import 'whatwg-fetch';
+
+import Editor from './Editor';
+import createSearchHighlightDecorater from './Editor/decorator/SearchHighlight';
 
 import './App.css';
 
@@ -19,14 +15,18 @@ type Props = {};
 
 type State = {
   editorState: EditorState,
-  isSaving: boolean
+  isSaving: boolean,
+  searchVisible: boolean
 };
 
 class App extends Component<Props, State> {
   state: State = {
     editorState: EditorState.createEmpty(),
-    isSaving: false
+    isSaving: false,
+    searchVisible: false
   };
+
+  input: ?HTMLInputElement;
 
   componentDidMount() {
     /*
@@ -42,14 +42,20 @@ class App extends Component<Props, State> {
           return;
         }
         const contentState = convertFromRaw(response);
+
         this.setState({
           editorState: EditorState.createWithContent(contentState)
         });
       });
   }
 
-  handleEditorStateChange = (editorState: EditorState) =>
-    this.setState({ editorState });
+  componentDidUpdate(prevProps: Props, prevState: State) {
+    if (!prevState.searchVisible && this.state.searchVisible && this.input) {
+      this.input.focus();
+    }
+  }
+
+  handleEditorStateChange = (editorState: EditorState) => this.setState({ editorState });
 
   serializeEditorState = (editorState: EditorState): RawDraftContentState => {
     /*
@@ -68,7 +74,7 @@ class App extends Component<Props, State> {
     */
     fetch('http://localhost:4000/state', {
       method: 'POST',
-      body: JSON.stringify(data),
+      body: JSON.stringify({ data }),
       headers: {
         'Content-Type': 'application/json'
       }
@@ -77,25 +83,13 @@ class App extends Component<Props, State> {
     });
   };
 
-  /*
-    Use RichUtils to tunr on shortkey format like CMD+B, CMD+I
-  */
-  handleKeyCommand = (
-    command: string,
-    editorState: EditorState
-  ): DraftHandleValue => {
-    const newState = RichUtils.handleKeyCommand(editorState, command);
-    if (newState) {
-      this.handleEditorStateChange(newState);
-      /*
-        handled means we already handle this case - no more work need
-      */
-      return 'handled';
-    }
-    /*
-      built-in handlers will be triggered if we return not-handleds
-    */
-    return 'not-handled';
+  handleSearchChange = (event: Object) => {
+    const text = event.target.value;
+    this.setState({
+      editorState: EditorState.set(this.state.editorState, {
+        decorator: new CompositeDecorator([createSearchHighlightDecorater(text)])
+      })
+    });
   };
 
   render() {
@@ -109,9 +103,13 @@ class App extends Component<Props, State> {
             editorState={this.state.editorState}
             onChange={this.handleEditorStateChange}
             placeholder="Tell something you like"
-            keyBindingFn={getDefaultKeyBinding}
-            handleKeyCommand={this.handleKeyCommand}
+            onSearch={() => this.setState({ searchVisible: !this.state.searchVisible })}
           />
+          <div>
+            {this.state.searchVisible && (
+              <input onChange={this.handleSearchChange} ref={input => (this.input = input)} />
+            )}
+          </div>
           <div onClick={this.handleSyncToServer} className="mui-btn">
             SAVE
           </div>
