@@ -2,16 +2,20 @@
 .*/build/.*
 .*/test/*
 .*/server/*
+.*/node_modules/draft-js/lib/DraftEditor.react.js.flow
+.*/node_modules/jss/lib/.*\.js\.flow
+.*/node_modules/eslint-plugin-jsx-a11y/*
+.*/node_modules/styled-components/.*
 
 [include]
-./node_modules/draft-js/**/.*\.js\.flow
-
+.*/node_modules/draft-js/**/.*\.js\.flow
 [libs]
-
-
+.*/node_modules/draft-js/**/.*\.react\.js\.flow
 [options]
 module.name_mapper='^\(.*\)$' -> '<PROJECT_ROOT>/src/\1'
 
 esproposal.class_static_fields=enable
 esproposal.class_instance_fields=enable
+
+suppress_type=$FlowFixMe
 suppress_comment= \\(.\\|\n\\)*\\$FlowFixMe
