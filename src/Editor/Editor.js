@@ -68,12 +68,7 @@ class MyEditor extends React.Component<Props> {
 
     return (
       <div style={{ position: 'relative' }}>
-        <Sidebar
-          editorState={editorState}
-          getEditorState={this.getEditorState}
-          setEditorState={this.handleEditorStateChange}
-          focus={this.focus}
-        />
+        <Sidebar editorState={editorState} setEditorState={this.handleEditorStateChange} />
 
         <Editor
           {...{ editorState, placeholder }}

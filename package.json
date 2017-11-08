@@ -6,6 +6,7 @@
     "draft-js": "0.10.4",
     "draft-js-export-markdown": "^1.2.0",
     "draft-js-import-markdown": "^1.2.1",
+    "hoist-non-react-statics": "^2.3.1",
     "lodash": "^4.17.4",
     "material-ui": "^1.0.0-beta.20",
     "material-ui-icons": "^1.0.0-beta.17",
