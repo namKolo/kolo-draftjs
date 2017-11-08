@@ -11,12 +11,17 @@ import {
 import type { DraftHandleValue } from 'draft-js/lib/DraftHandleValue';
 
 import Sidebar from './controls/Sidebar';
+import Toolbar from './controls/Toolbar';
 
 type Props = {
   editorState: EditorState,
   placeholder?: string,
   onChange: (editorState: EditorState) => void,
   onSearch?: () => void
+};
+
+type State = {
+  hasFocus: boolean
 };
 
 const { hasCommandModifier } = KeyBindingUtil;
@@ -28,8 +33,13 @@ function myKeyBindingFn(e: SyntheticKeyboardEvent<>): ?string {
   return getDefaultKeyBinding(e);
 }
 
-class MyEditor extends React.Component<Props> {
+class MyEditor extends React.Component<Props, State> {
+  state = {
+    hasFocus: false
+  };
+
   editor: ?Editor;
+  editorWrapper: ?HTMLElement;
 
   handleEditorStateChange = (editorState: EditorState) => this.props.onChange(editorState);
   /*
@@ -61,15 +71,37 @@ class MyEditor extends React.Component<Props> {
     }
   };
 
+  handleFocus = () => {
+    this.setState({
+      hasFocus: true
+    });
+  };
+
+  handleBlur = () => {
+    this.setState({
+      hasFocus: false
+    });
+  };
+
   getEditorState = () => this.props.editorState;
 
   render() {
     const { editorState, placeholder } = this.props;
+    const { hasFocus } = this.state;
 
     return (
-      <div style={{ position: 'relative' }}>
+      <div
+        style={{ position: 'relative' }}
+        onBlur={this.handleBlur}
+        onFocus={this.handleFocus}
+        ref={el => (this.editorWrapper = el)}
+      >
         <Sidebar editorState={editorState} setEditorState={this.handleEditorStateChange} />
-
+        <Toolbar
+          {...{ editorState, editorFocus: hasFocus }}
+          setEditorState={this.handleEditorStateChange}
+          editorEl={this.editorWrapper}
+        />
         <Editor
           {...{ editorState, placeholder }}
           onChange={this.handleEditorStateChange}
