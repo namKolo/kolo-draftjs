@@ -1,13 +1,6 @@
 // @flow
 import * as React from 'react';
-import {
-  Editor,
-  EditorState,
-  RichUtils,
-  getDefaultKeyBinding,
-  CompositeDecorator,
-  KeyBindingUtil
-} from 'draft-js';
+import { Editor, EditorState, RichUtils, getDefaultKeyBinding, KeyBindingUtil } from 'draft-js';
 import type { DraftHandleValue } from 'draft-js/lib/DraftHandleValue';
 
 import Sidebar from './controls/Sidebar';
@@ -78,6 +71,7 @@ class MyEditor extends React.Component<Props, State> {
   };
 
   handleBlur = () => {
+    console.log('blur editor');
     this.setState({
       hasFocus: false
     });

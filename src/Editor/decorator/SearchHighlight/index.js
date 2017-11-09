@@ -9,7 +9,8 @@ const SearchHighlight = (props: { children: React.Node }): React.Node => (
 const findWithRegex = (regex, contentBlock, callback) => {
   const text = contentBlock.getText();
   let matchArr, start, end;
-  while ((matchArr = regex.exec(text)) !== null) {
+  while (regex.exec(text) !== null) {
+    matchArr = regex.exec(text);
     start = matchArr.index;
     end = start + matchArr[0].length;
     callback(start, end);

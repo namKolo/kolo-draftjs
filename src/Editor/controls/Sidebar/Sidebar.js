@@ -1,6 +1,5 @@
 // @flow
 import React, { Component } from 'react';
-import type { ComponentType } from 'react';
 import styled from 'styled-components';
 import { darken } from 'material-ui/styles/colorManipulator';
 import AddIcon from 'material-ui-icons/Add';
@@ -76,7 +75,6 @@ class Sidebar extends Component<Props, State> {
 
   render() {
     const { calculatedTop } = this.props;
-    const { open } = this.state;
     return (
       <div style={{ top: calculatedTop, position: 'absolute', left: -56 }}>
         {this.renderMenuItems()}
@@ -85,5 +83,4 @@ class Sidebar extends Component<Props, State> {
   }
 }
 
-const EnhancedSidebar: ComponentType<SidebarProps> = withPositionUpdater(Sidebar);
-export default EnhancedSidebar;
+export default withPositionUpdater(Sidebar);

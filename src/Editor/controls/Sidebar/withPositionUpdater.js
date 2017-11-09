@@ -3,15 +3,12 @@ import React, { Component } from 'react';
 import type { ComponentType } from 'react';
 import hoistStatics from 'hoist-non-react-statics';
 import { findDOMNode } from 'react-dom';
-import AddIcon from 'material-ui-icons/Add';
-import styled from 'styled-components';
 
 import { getSelectedBlockElement } from '../../util';
-import style from '../../style';
 
 import type { SidebarProps, PositionUpdaterInjectedProps } from './type';
 
-export default function withPositionUpdater<SidebarProps>(
+export default function withPositionUpdater(
   WrappedComponent: ComponentType<PositionUpdaterInjectedProps & SidebarProps>
 ): ComponentType<SidebarProps> {
   type State = {
@@ -74,9 +71,5 @@ export default function withPositionUpdater<SidebarProps>(
     }
   }
 
-  const EnhancedComponent: ComponentType<SidebarProps> = hoistStatics(
-    PositionUpdater,
-    WrappedComponent
-  );
-  return EnhancedComponent;
+  return hoistStatics(PositionUpdater, WrappedComponent);
 }

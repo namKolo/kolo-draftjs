@@ -10,7 +10,7 @@ export function getSelectedBlockElement() {
   var node = selection.getRangeAt(0).startContainer;
 
   do {
-    if (node.getAttribute && node.getAttribute('data-block') == 'true') {
+    if (node.getAttribute && node.getAttribute('data-block') === 'true') {
       return node;
     }
     node = node.parentNode;

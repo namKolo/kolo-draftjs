@@ -1,11 +1,14 @@
 // @flow
 import React, { Component } from 'react';
 import styled from 'styled-components';
+import { RichUtils } from 'draft-js';
 
 import { getSelectionCoords } from '../../util';
 import sv from '../../style';
 
-import type { ToolbarProps } from './type';
+import type { ToolbarProps, ToolbarAction } from './type';
+import defaultActions from './action';
+import ToolbarButton from './Button';
 
 const StyledToolbarWrapper = styled.div`
   background: yellow;
@@ -59,12 +62,12 @@ export default class Toolbar extends Component<ToolbarProps, State> {
   toolbarEl: ?HTMLElement;
   arrowEl: ?HTMLElement;
 
-  shouldDisplayToolbar() {
+  shouldDisplayToolbar = () => {
     const { editorFocus, editorState } = this.props;
     return editorFocus && !editorState.getSelection().isCollapsed();
-  }
+  };
 
-  updatePosition() {
+  updatePosition = () => {
     const { editorEl } = this.props;
     const toolbarEl = this.toolbarEl;
     const selectionCoords = getSelectionCoords(editorEl, toolbarEl);
@@ -85,7 +88,7 @@ export default class Toolbar extends Component<ToolbarProps, State> {
         }
       });
     }
-  }
+  };
 
   hideToolbar = () => this.state.visible && this.setState({ visible: false });
 
@@ -101,6 +104,33 @@ export default class Toolbar extends Component<ToolbarProps, State> {
     }
   }
 
+  toggleInlineStyle = (inlineStyle: string) => {
+    const newEditorState = RichUtils.toggleInlineStyle(this.props.editorState, inlineStyle);
+    this.props.setEditorState(newEditorState);
+  };
+
+  renderAction = (action: ToolbarAction, index: number) => {
+    let active;
+    let onToggle;
+
+    const { editorState } = this.props;
+
+    switch (action.type) {
+      case 'inline': {
+        const current = editorState.getCurrentInlineStyle();
+        onToggle = () => this.toggleInlineStyle(action.style);
+        active = current.has(action.style);
+        break;
+      }
+
+      default: {
+        break;
+      }
+    }
+
+    return <ToolbarButton key={action.label} {...{ active, onToggle, action }} />;
+  };
+
   render() {
     const { visible } = this.state;
 
@@ -112,7 +142,9 @@ export default class Toolbar extends Component<ToolbarProps, State> {
               this.toolbarEl = el;
             }}
           >
-            <div>Hello</div>
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+              {defaultActions.map(this.renderAction)}
+            </div>
             <StyledArrow
               innerRef={el => {
                 this.arrowEl = el;
