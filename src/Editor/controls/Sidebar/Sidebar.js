@@ -5,6 +5,7 @@ import { darken } from 'material-ui/styles/colorManipulator';
 import AddIcon from 'material-ui-icons/Add';
 import ImageIcon from 'material-ui-icons/Image';
 import VideoIcon from 'material-ui-icons/VideoCall';
+import Button from 'material-ui/Button';
 
 import withPositionUpdater from './withPositionUpdater';
 import type { SidebarProps, PositionUpdaterInjectedProps } from './type';
@@ -15,9 +16,7 @@ const size = {
   default: '36px'
 };
 
-const StyledItem = styled.div`
-  height: ${props => size[props.size || 'default']};
-  width: ${props => size[props.size || 'default']};
+const StyledItem = styled(Button)`
   background-color: ${style.primaryColor};
   cursor: pointer;
   color: white;
@@ -60,14 +59,24 @@ class Sidebar extends Component<Props, State> {
         onMouseEnter={() => this.setState({ open: true })}
         onMouseLeave={() => this.setState({ open: false })}
       >
-        <StyledItem open>
+        <StyledItem open fab color="accent" style={{ width: 36, height: 36, minHeight: 36 }}>
           <AddIcon />
         </StyledItem>
-        <StyledItem {...{ open }} size="small">
-          <ImageIcon />
+        <StyledItem
+          {...{ open }}
+          color="primary"
+          fab
+          style={{ width: 30, height: 30, minHeight: 30 }}
+        >
+          <ImageIcon style={{ width: 18, height: 18 }} />
         </StyledItem>
-        <StyledItem {...{ open }} size="small">
-          <VideoIcon />
+        <StyledItem
+          {...{ open }}
+          color="primary"
+          fab
+          style={{ width: 30, height: 30, minHeight: 30 }}
+        >
+          <VideoIcon style={{ width: 18, height: 18 }} />
         </StyledItem>
       </StyledItemList>
     );
@@ -76,7 +85,7 @@ class Sidebar extends Component<Props, State> {
   render() {
     const { calculatedTop } = this.props;
     return (
-      <div style={{ top: calculatedTop, position: 'absolute', left: -56 }}>
+      <div style={{ top: calculatedTop, position: 'absolute', left: -50 }}>
         {this.renderMenuItems()}
       </div>
     );

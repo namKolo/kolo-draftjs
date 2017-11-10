@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import styled from 'styled-components';
 import { RichUtils } from 'draft-js';
 
-import { getSelectionCoords } from '../../util';
+import { getSelectionCoords, hasEntity, insertEntity } from '../../util';
 import sv from '../../style';
 
 import type { ToolbarProps, ToolbarAction } from './type';
@@ -109,6 +109,12 @@ export default class Toolbar extends Component<ToolbarProps, State> {
     this.props.setEditorState(newEditorState);
   };
 
+  toggleEntity = (entity: string) => {
+    const { editorState } = this.props;
+    const newEditorState = insertEntity(editorState, entity);
+    this.props.setEditorState(newEditorState);
+  };
+
   renderAction = (action: ToolbarAction, index: number) => {
     let active;
     let onToggle;
@@ -118,8 +124,16 @@ export default class Toolbar extends Component<ToolbarProps, State> {
     switch (action.type) {
       case 'inline': {
         const current = editorState.getCurrentInlineStyle();
-        onToggle = () => this.toggleInlineStyle(action.style);
+        onToggle = () => this.toggleInlineStyle(action.style || '');
         active = current.has(action.style);
+        break;
+      }
+
+      case 'entity': {
+        const { entity = '' } = action;
+        const current = editorState.getCurrentInlineStyle();
+        onToggle = () => this.toggleEntity(entity);
+        active = hasEntity(this.props.editorState, entity);
         break;
       }
 

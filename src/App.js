@@ -21,7 +21,9 @@ type State = {
 
 class App extends Component<Props, State> {
   state: State = {
-    editorState: EditorState.createEmpty(),
+    editorState: EditorState.createEmpty(
+      new CompositeDecorator([createSearchHighlightDecorater()])
+    ),
     isSaving: false,
     searchVisible: false
   };
@@ -87,7 +89,7 @@ class App extends Component<Props, State> {
     const text = event.target.value;
     this.setState({
       editorState: EditorState.set(this.state.editorState, {
-        decorator: new CompositeDecorator([createSearchHighlightDecorater(text)])
+        decorator: new CompositeDecorator([createSearchHighlightDecorater()])
       })
     });
   };

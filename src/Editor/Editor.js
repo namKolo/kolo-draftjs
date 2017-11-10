@@ -5,6 +5,7 @@ import type { DraftHandleValue } from 'draft-js/lib/DraftHandleValue';
 
 import Sidebar from './controls/Sidebar';
 import Toolbar from './controls/Toolbar';
+import createSearchHighlightDecorater from './decorator/SearchHighlight';
 
 type Props = {
   editorState: EditorState,

@@ -13,5 +13,6 @@ export type ToolbarAction = {
   type: 'inline' | 'entity',
   icon: ComponentType<any>,
   label: string,
-  style: string
+  style?: string,
+  entity?: string
 };
