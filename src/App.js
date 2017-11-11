@@ -49,7 +49,8 @@ class App extends Component<Props, State> {
         const contentState = convertFromRaw(response.data);
 
         this.setState({
-          editorState: EditorState.createWithContent(contentState)
+          // $FlowFixMe
+          editorState: EditorState.createWithContent(contentState, decorator)
         });
       });
   }

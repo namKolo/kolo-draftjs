@@ -73,7 +73,6 @@ class MyEditor extends React.Component<Props, State> {
   };
 
   handleBlur = () => {
-    console.log('blur editor');
     this.setState({
       hasFocus: false
     });
