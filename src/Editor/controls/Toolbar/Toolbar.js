@@ -111,6 +111,7 @@ export default class Toolbar extends Component<ToolbarProps, State> {
 
   toggleEntity = (entity: string) => {
     const { editorState } = this.props;
+    // $FlowFixMe
     const newEditorState = insertEntity(editorState, entity);
     this.props.setEditorState(newEditorState);
   };

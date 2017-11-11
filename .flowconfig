@@ -8,7 +8,7 @@
 .*/node_modules/styled-components/.*
 
 [include]
-.*/node_modules/draft-js/**/.*\.js\.flow
+
 [libs]
 .*/node_modules/draft-js/**/.*\.react\.js\.flow
 [options]

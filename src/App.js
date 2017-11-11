@@ -7,7 +7,7 @@ import { EditorState, convertToRaw, convertFromRaw, CompositeDecorator } from 'd
 import type { RawDraftContentState } from 'draft-js/lib/RawDraftContentState';
 
 import Editor from './Editor';
-import createSearchHighlightDecorater from './Editor/decorator/SearchHighlight';
+import HighlightDecorator from './Editor/decorator/Highlight';
 
 import './App.css';
 
@@ -19,11 +19,12 @@ type State = {
   searchVisible: boolean
 };
 
+const decorator = new CompositeDecorator([HighlightDecorator]);
+
 class App extends Component<Props, State> {
   state: State = {
-    editorState: EditorState.createEmpty(
-      new CompositeDecorator([createSearchHighlightDecorater()])
-    ),
+    // $FlowFixMe
+    editorState: EditorState.createEmpty(decorator),
     isSaving: false,
     searchVisible: false
   };
@@ -89,7 +90,7 @@ class App extends Component<Props, State> {
     const text = event.target.value;
     this.setState({
       editorState: EditorState.set(this.state.editorState, {
-        decorator: new CompositeDecorator([createSearchHighlightDecorater()])
+        decorator: new CompositeDecorator([HighlightDecorator])
       })
     });
   };
