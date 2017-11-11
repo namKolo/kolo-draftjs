@@ -70,6 +70,7 @@ export function hasEntity(editorState: EditorState, entityType: string): boolean
   return false;
 }
 
+// $FlowFixMe
 export function insertEntity(
   editorState: EditorState,
   entityType: DraftEntityType,
@@ -84,6 +85,15 @@ export function insertEntity(
     editorState.getSelection(),
     entityKey
   );
+  const newEditorState = EditorState.set(editorState, { currentContent: newContentState });
+
+  return newEditorState;
+}
+
+// $FlowFixMe
+export function removeEntity(editorState: EditorState, entityKey: string) {
+  const contentState = editorState.getCurrentContent();
+  const newContentState = Modifier.applyEntity(contentState, editorState.getSelection(), null);
   const newEditorState = EditorState.set(editorState, { currentContent: newContentState });
 
   return newEditorState;

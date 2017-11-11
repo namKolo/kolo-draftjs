@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import styled from 'styled-components';
 import { RichUtils } from 'draft-js';
 
-import { getSelectionCoords, hasEntity, insertEntity } from '../../util';
+import { getSelectionCoords, hasEntity, insertEntity, removeEntity } from '../../util';
 import sv from '../../style';
 
 import type { ToolbarProps, ToolbarAction } from './type';
@@ -112,7 +112,12 @@ export default class Toolbar extends Component<ToolbarProps, State> {
   toggleEntity = (entity: string) => {
     const { editorState } = this.props;
     // $FlowFixMe
-    const newEditorState = insertEntity(editorState, entity);
+    const active = hasEntity(editorState, entity);
+    const newEditorState = !active
+      ? // $FlowFixMe
+        insertEntity(editorState, entity)
+      : removeEntity(editorState, entity);
+
     this.props.setEditorState(newEditorState);
   };
 
@@ -132,7 +137,6 @@ export default class Toolbar extends Component<ToolbarProps, State> {
 
       case 'entity': {
         const { entity = '' } = action;
-        const current = editorState.getCurrentInlineStyle();
         onToggle = () => this.toggleEntity(entity);
         active = hasEntity(this.props.editorState, entity);
         break;

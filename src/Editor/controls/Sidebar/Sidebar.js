@@ -11,11 +11,6 @@ import withPositionUpdater from './withPositionUpdater';
 import type { SidebarProps, PositionUpdaterInjectedProps } from './type';
 import style from '../../style';
 
-const size = {
-  small: '30px',
-  default: '36px'
-};
-
 const StyledItem = styled(Button)`
   background-color: ${style.primaryColor};
   cursor: pointer;

@@ -3,6 +3,8 @@ import 'draft-js/dist/Draft.css';
 import 'whatwg-fetch';
 import isEmpty from 'lodash/isEmpty';
 import React, { Component } from 'react';
+import Paper from 'material-ui/Paper';
+import Button from 'material-ui/Button';
 import { EditorState, convertToRaw, convertFromRaw, CompositeDecorator } from 'draft-js';
 import type { RawDraftContentState } from 'draft-js/lib/RawDraftContentState';
 
@@ -86,37 +88,25 @@ class App extends Component<Props, State> {
     });
   };
 
-  handleSearchChange = (event: Object) => {
-    const text = event.target.value;
-    this.setState({
-      editorState: EditorState.set(this.state.editorState, {
-        decorator: new CompositeDecorator([HighlightDecorator])
-      })
-    });
-  };
-
   render() {
     return (
       <div className="app">
         <div className="mui--text-center mui--text-headline margin-bottom-small">
           Editor built on top of DraftJS
         </div>
-        <div className="mui-panel">
+        <Paper style={{ padding: 20 }}>
           <Editor
             editorState={this.state.editorState}
             onChange={this.handleEditorStateChange}
             placeholder="Tell something you like"
             onSearch={() => this.setState({ searchVisible: !this.state.searchVisible })}
           />
-          <div>
-            {this.state.searchVisible && (
-              <input onChange={this.handleSearchChange} ref={input => (this.input = input)} />
-            )}
+          <div style={{ textAlign: 'right' }}>
+            <Button raised primary onClick={this.handleSyncToServer}>
+              SAVE
+            </Button>
           </div>
-          <div onClick={this.handleSyncToServer} className="mui-btn">
-            SAVE
-          </div>
-        </div>
+        </Paper>
       </div>
     );
   }
