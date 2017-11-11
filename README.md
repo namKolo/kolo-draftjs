@@ -11,6 +11,6 @@ This is one of my school project 's feature. You can read my [adventure](https:/
 - [x] Display toolbar when select text
 - [x] Support Bold, Italic
 - [x] Highlight feature
-- [] Add image/video
-- [] Support markdown
-- [] Support drag & drop image
+- [ ] Add image/video
+- [ ] Support markdown
+- [ ] Support drag & drop image
