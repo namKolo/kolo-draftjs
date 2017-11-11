@@ -90,7 +90,6 @@ class App extends Component<Props, State> {
   };
 
   render() {
-    console.log(this.serializeEditorState(this.state.editorState));
     return (
       <div className="app">
         <div className="mui--text-center mui--text-headline margin-bottom-small">
@@ -104,7 +103,7 @@ class App extends Component<Props, State> {
             onSearch={() => this.setState({ searchVisible: !this.state.searchVisible })}
           />
           <div style={{ textAlign: 'right' }}>
-            <Button raised primary onClick={this.handleSyncToServer}>
+            <Button raised color="primary" onClick={this.handleSyncToServer}>
               SAVE
             </Button>
           </div>

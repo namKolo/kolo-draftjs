@@ -2,13 +2,16 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
 import { EditorBlock, EditorState, SelectionState } from 'draft-js';
-
-import { getCurrentBlock } from '../util';
+import IconButton from 'material-ui/IconButton';
+import DeleteIcon from 'material-ui-icons/Delete';
+import { getCurrentBlock, resetBlockWithType } from '../util';
 import type { BlockProps } from './index';
 
 const StyledBlockImage = styled.div`
+  border: ${props => (props.shouldDisplayBorder ? '1px solid grey' : '1px solid white')};
   margin: 10px 0;
   background: #fbfbfb;
+  position: relative;
 
   img {
     cursor: default;
@@ -38,7 +41,25 @@ const StyledCaption = styled.figcaption`
   }
 `;
 
-class ImageBlock extends Component<BlockProps> {
+type State = {
+  isHover: boolean
+};
+class ImageBlock extends Component<BlockProps, State> {
+  state = {
+    isHover: false
+  };
+
+  componentWillMount() {
+    const { blockKeyStore } = this.props.blockProps;
+    console.log('ImageBlock: addBlockKey');
+    blockKeyStore.add(this.props.block.getKey());
+  }
+
+  componentWillUnmount() {
+    const { blockKeyStore } = this.props.blockProps;
+    blockKeyStore.remove(this.props.block.getKey());
+  }
+
   focusBlock = () => {
     const { block, blockProps } = this.props;
     const { getEditorState, setEditorState } = blockProps;
@@ -57,13 +78,48 @@ class ImageBlock extends Component<BlockProps> {
     setEditorState(EditorState.forceSelection(editorState, newSelection));
   };
 
+  isFocus = (): boolean => {
+    const { block, blockProps } = this.props;
+    const { getEditorState } = blockProps;
+    const editorState = getEditorState();
+    const key = block.getKey();
+    const currentblock = getCurrentBlock(editorState);
+    return currentblock.getKey() === key;
+  };
+
+  handleBlockRemove = () => {
+    if (!this.isFocus()) {
+      return;
+    }
+    const { blockProps } = this.props;
+    const { setEditorState, getEditorState } = blockProps;
+    const editorState = getEditorState();
+
+    setEditorState(resetBlockWithType(editorState, 'unstyled', { text: '' }));
+  };
+
   render() {
     const { block } = this.props;
+    const { isHover } = this.state;
     const data = block.getData();
     const src = data.get('src');
+    const focus = this.isFocus();
+
     if (src !== null) {
       return (
-        <StyledBlockImage>
+        <StyledBlockImage
+          {...{ shouldDisplayBorder: isHover || focus }}
+          onMouseEnter={() => this.setState({ isHover: true })}
+          onMouseLeave={() => this.setState({ isHover: false })}
+        >
+          {focus && (
+            <IconButton
+              style={{ position: 'absolute', top: -20, right: -30, zIndex: 1000 }}
+              onClick={this.handleBlockRemove}
+            >
+              <DeleteIcon style={{ fontSize: 25 }} />
+            </IconButton>
+          )}
           <div style={{ position: 'relative' }} onClick={this.focusBlock}>
             <img role="presentation" src={src} alt="text" />
           </div>

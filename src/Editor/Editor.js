@@ -2,11 +2,15 @@
 import * as React from 'react';
 import { Editor, EditorState, RichUtils, getDefaultKeyBinding, KeyBindingUtil } from 'draft-js';
 import type { DraftHandleValue } from 'draft-js/lib/DraftHandleValue';
+import isSoftNewlineEvent from 'draft-js/lib/isSoftNewlineEvent';
 
 import Sidebar from './controls/Sidebar';
 import Toolbar from './controls/Toolbar';
 
 import { blockRenderFn } from './blocks';
+import createPluginFocus from './plugin/focus';
+
+const focusPlugin = createPluginFocus({});
 
 type Props = {
   editorState: EditorState,
@@ -36,7 +40,10 @@ class MyEditor extends React.Component<Props, State> {
   editor: ?Editor;
   editorWrapper: ?HTMLElement;
 
-  handleEditorStateChange = (editorState: EditorState) => this.props.onChange(editorState);
+  handleEditorStateChange = (editorState: EditorState) => {
+    const { onChange } = this.props;
+    onChange(focusPlugin.onChange(editorState));
+  };
   /*
     Use RichUtils to tunr on shortkey format like CMD+B, CMD+I
   */
@@ -78,10 +85,27 @@ class MyEditor extends React.Component<Props, State> {
     });
   };
 
+  handleReturn = (e: SyntheticKeyboardEvent<>) => {
+    const { editorState } = this.props;
+    if (isSoftNewlineEvent(e)) {
+      this.handleEditorStateChange(RichUtils.insertSoftNewline(editorState));
+      return 'handled';
+    }
+
+    return 'not-handled';
+  };
+
   getEditorState = () => this.props.editorState;
 
   getBlockRenderFn = () => {
-    return blockRenderFn(this.props.onChange, this.getEditorState);
+    return blockRenderFn(
+      this.props.editorState,
+      this.handleEditorStateChange,
+      this.getEditorState,
+      {
+        blockKeyStore: focusPlugin.blockKeyStore
+      }
+    );
   };
 
   render() {
@@ -107,6 +131,7 @@ class MyEditor extends React.Component<Props, State> {
           keyBindingFn={myKeyBindingFn}
           handleKeyCommand={this.handleKeyCommand}
           blockRendererFn={this.getBlockRenderFn()}
+          handleReturn={this.handleReturn}
           ref={editor => (this.editor = editor)}
         />
       </div>

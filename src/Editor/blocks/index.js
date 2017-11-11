@@ -3,7 +3,7 @@
 import { ContentBlock, EditorState } from 'draft-js';
 import ImageBlock from './Image';
 
-export type BlockEnum = 'IMAGE';
+export type BlockEnum = 'IMAGE' | 'unstyled';
 
 export type BlockProps = {
   block: ContentBlock,
@@ -14,13 +14,20 @@ export type BlockProps = {
 };
 
 export const Block = {
+  UNSTYLED: 'unstyled',
   IMAGE: 'IMAGE',
   TODO: 'TODO'
 };
 
+type Option = {
+  blockKeyStore: Object
+};
+
 export const blockRenderFn = (
+  editorState: EditorState,
   setEditorState: (editorState: EditorState) => void,
-  getEditorState: () => EditorState
+  getEditorState: () => EditorState,
+  option: Option
 ) => (contentBlock: ContentBlock) => {
   const type = contentBlock.getType();
   switch (type) {
@@ -28,8 +35,10 @@ export const blockRenderFn = (
       return {
         component: ImageBlock,
         props: {
+          editorState,
           setEditorState,
-          getEditorState
+          getEditorState,
+          blockKeyStore: option.blockKeyStore
         }
       };
 

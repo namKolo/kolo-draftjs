@@ -156,3 +156,30 @@ export const addNewBlock = (
   }
   return editorState;
 };
+
+/*
+Changes the block type of the current block.
+*/
+export const resetBlockWithType = (
+  editorState: EditorState,
+  newType: BlockEnum = Block.UNSTYLED,
+  overrides: Object = {}
+) => {
+  const contentState = editorState.getCurrentContent();
+  const selectionState = editorState.getSelection();
+  const key = selectionState.getStartKey();
+  const blockMap = contentState.getBlockMap();
+  const block = blockMap.get(key);
+  const newBlock = block.mergeDeep(overrides, {
+    type: newType,
+    data: getDefaultBlockData(newType)
+  });
+  const newContentState = contentState.merge({
+    blockMap: blockMap.set(key, newBlock),
+    selectionAfter: selectionState.merge({
+      anchorOffset: 0,
+      focusOffset: 0
+    })
+  });
+  return EditorState.push(editorState, newContentState, 'change-block-type');
+};
