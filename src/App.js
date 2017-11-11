@@ -46,7 +46,7 @@ class App extends Component<Props, State> {
         if (isEmpty(response)) {
           return;
         }
-        const contentState = convertFromRaw(response);
+        const contentState = convertFromRaw(response.data);
 
         this.setState({
           editorState: EditorState.createWithContent(contentState)
@@ -89,6 +89,7 @@ class App extends Component<Props, State> {
   };
 
   render() {
+    console.log(this.serializeEditorState(this.state.editorState));
     return (
       <div className="app">
         <div className="mui--text-center mui--text-headline margin-bottom-small">

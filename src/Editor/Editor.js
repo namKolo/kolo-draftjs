@@ -6,6 +6,8 @@ import type { DraftHandleValue } from 'draft-js/lib/DraftHandleValue';
 import Sidebar from './controls/Sidebar';
 import Toolbar from './controls/Toolbar';
 
+import { blockRenderFn } from './blocks';
+
 type Props = {
   editorState: EditorState,
   placeholder?: string,
@@ -79,6 +81,10 @@ class MyEditor extends React.Component<Props, State> {
 
   getEditorState = () => this.props.editorState;
 
+  getBlockRenderFn = () => {
+    return blockRenderFn(this.props.onChange, this.getEditorState);
+  };
+
   render() {
     const { editorState, placeholder } = this.props;
     const { hasFocus } = this.state;
@@ -101,6 +107,7 @@ class MyEditor extends React.Component<Props, State> {
           onChange={this.handleEditorStateChange}
           keyBindingFn={myKeyBindingFn}
           handleKeyCommand={this.handleKeyCommand}
+          blockRendererFn={this.getBlockRenderFn()}
           ref={editor => (this.editor = editor)}
         />
       </div>

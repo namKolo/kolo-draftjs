@@ -1,8 +1,11 @@
 // @flow
-import { getVisibleSelectionRect, EditorState, Modifier } from 'draft-js';
+import { getVisibleSelectionRect, EditorState, Modifier, ContentBlock } from 'draft-js';
 import DraftEntityInstance from 'draft-js/lib/DraftEntityInstance';
 import type { DraftEntityType } from 'draft-js/lib/DraftEntityType';
 import type { DraftEntityMutability } from 'draft-js/lib/DraftEntityMutability';
+
+import type { BlockEnum } from '../blocks';
+import { Block } from '../blocks';
 
 // Finds the block parent of the current selection
 // https://github.com/facebook/draft-js/issues/45
@@ -98,3 +101,58 @@ export function removeEntity(editorState: EditorState, entityKey: string) {
 
   return newEditorState;
 }
+
+/*
+Returns default block-level metadata for various block type. Empty object otherwise.
+*/
+export const getDefaultBlockData = (blockType: BlockEnum, initialData: Object = {}): Object => {
+  switch (blockType) {
+    case Block.TODO:
+      return { checked: false };
+    default:
+      return initialData;
+  }
+};
+
+/*
+Get currentBlock in the editorState.
+*/
+export const getCurrentBlock = (editorState: EditorState): ContentBlock => {
+  const selectionState = editorState.getSelection();
+  const contentState = editorState.getCurrentContent();
+  const block = contentState.getBlockForKey(selectionState.getStartKey());
+  return block;
+};
+
+export const addNewBlock = (
+  editorState: EditorState,
+  newType: BlockEnum,
+  initialData: Object = {}
+) => {
+  const selectionState = editorState.getSelection();
+  if (!selectionState.isCollapsed()) {
+    return editorState;
+  }
+  const contentState = editorState.getCurrentContent();
+  const key = selectionState.getStartKey();
+  const blockMap = contentState.getBlockMap();
+  const currentBlock = getCurrentBlock(editorState);
+  if (!currentBlock) {
+    return editorState;
+  }
+  if (currentBlock.getLength() === 0) {
+    if (currentBlock.getType() === newType) {
+      return editorState;
+    }
+    const newBlock = currentBlock.merge({
+      type: newType,
+      data: getDefaultBlockData(newType, initialData)
+    });
+    const newContentState = contentState.merge({
+      blockMap: blockMap.set(key, newBlock),
+      selectionAfter: selectionState
+    });
+    return EditorState.push(editorState, newContentState, 'change-block-type');
+  }
+  return editorState;
+};
