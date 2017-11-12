@@ -9,6 +9,7 @@ import Toolbar from './controls/Toolbar';
 
 import { blockRenderFn } from './blocks';
 import createPluginFocus from './plugin/focus';
+import { insertEntity } from './util';
 
 const focusPlugin = createPluginFocus({});
 
@@ -28,6 +29,10 @@ const { hasCommandModifier } = KeyBindingUtil;
 function myKeyBindingFn(e: SyntheticKeyboardEvent<>): ?string {
   if (e.keyCode === 70 && hasCommandModifier(e)) {
     return 'search';
+  }
+
+  if (e.keyCode === 72 && hasCommandModifier(e)) {
+    return 'highlight';
   }
   return getDefaultKeyBinding(e);
 }
@@ -50,6 +55,13 @@ class MyEditor extends React.Component<Props, State> {
   handleKeyCommand = (command: string, editorState: EditorState): DraftHandleValue => {
     if (command === 'search' && this.props.onSearch) {
       this.props.onSearch();
+      return 'handled';
+    }
+
+    if (command === 'highlight') {
+      // $FlowFixMe
+      const newEditorState = insertEntity(editorState, 'HIGHLIGHT');
+      this.handleEditorStateChange(newEditorState);
       return 'handled';
     }
 
